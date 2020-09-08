@@ -49,10 +49,11 @@ patterns_val = validation[:2, :]
 targets_tr = training[-1:, :] # (1, 1.5*ndata)
 targets_te = validation[-1:, :]
 
-e_tr, e_val = delta_rule_1hlayer_batch_val(patterns_tr, patterns_val, targets_tr, targets_te, epochs = 100, n_hidden = 100)
+e_tr, e_val = delta_rule_1hlayer_batch_val(patterns_tr, patterns_val, targets_tr, targets_te, epochs = 100, n_hidden = 10)
 plt.legend('-AB')
 
-plot_error(e_tr, '-25% each delta rule')
-plot_error(e_val, '-25% each validation delta rule', new_fig = False)
+plot_error(e_val)
+plot_error(e_tr, '-25% each delta rule', new_fig = False)
+plt.legend('vt')
 plt.show()
 plt.close()

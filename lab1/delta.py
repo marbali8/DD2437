@@ -129,7 +129,7 @@ def delta_rule_0hlayer_batch(patterns, targets, eta = 0.001, alpha = 0.9, epochs
         oin = np.dot(w, np.concatenate((patterns, bias))) # neuron "sum" before act, adds bias row
         out = -1*(oin <= 0) + 1*(oin > 0) # activation (tlu)
 
-        err = np.append(err, ((targets - oin)**2).mean())
+        err = np.append(err, ((targets - out)**2).mean())
 
         ## backward pass (error signal for each node, from end to start)
 
@@ -163,7 +163,7 @@ def delta_rule_0hlayer_seq(patterns, targets, eta = 0.001, alpha = 0.9, epochs =
             oin = np.dot(w, np.concatenate((p, bias))) # neuron "sum" before act, adds bias row
             out = -1*(oin <= 0) + 1*(oin > 0) # activation (tlu)
 
-            err = np.append(err, ((targets[0, i] - oin)**2).mean()).reshape((-1, 1))
+            err = np.append(err, ((targets[0, i] - out)**2).mean()).reshape((-1, 1))
 
             ## backward pass (error signal for each node, from end to start)
 
@@ -193,7 +193,7 @@ def delta_rule_0hlayer_batch_nbias(patterns, targets, eta = 0.001, alpha = 0.9, 
         oin = np.dot(w, patterns) # neuron "sum" before act, adds bias row
         out = -1*(oin <= 0) + 1*(oin > 0) # activation (tlu)
 
-        err = np.append(err, ((targets - oin)**2).mean())
+        err = np.append(err, ((targets - out)**2).mean())
 
         ## backward pass (error signal for each node, from end to start)
 
