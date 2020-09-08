@@ -1,16 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def delta_rule_1hlayer_batch(patterns, targets, n_hidden = 2, eta = 0.001, alpha = 0.9, epochs = 20, plot = True):
+def delta_rule_1hlayer_batch(patterns, targets, n_hidden = 2, eta = 0.001, alpha = 0.9, epochs = 20, plot_d = True, plot_acc = False):
 
     ## initialisation
-    # n_hidden = 2
-    # nIt = 60 # ?????
-    # stepL = 1 # ?????
-    # eta = 0.001 # learning rate
-    # alpha = 0.9 # momentum
-    # epochs = 20 # how many times the batch goes through the network
-
     ndata = patterns.shape[1] # cols
     in_dim = patterns.shape[0]
 
@@ -20,22 +13,25 @@ def delta_rule_1hlayer_batch(patterns, targets, n_hidden = 2, eta = 0.001, alpha
     dw = np.zeros(w.shape)
     dv = np.zeros(v.shape)
     err = np.array([])
+    acc = np.array([])
 
     x1 = np.arange(-3, 3, 0.5)
 
     for e in range(epochs): # [0, epochs-1]
 
-        ## forward pass (layer for la2yer, from start to end)
-        hin = np.dot(v, np.concatenate((patterns, bias))) # neuron "sum" before act, adds bias row 3,8
-        hout = np.concatenate((2 / (1 + np.exp(-hin)) - 1, bias)) # activation phi 4, 8
-        oin = np.dot(w, hout) # (1, patterns.shape[1]+1) 8,8
-        out = 2 / (1 + np.exp(-oin)) - 1 # (1, ndata) = targets.shape 8,8
+        ## forward pass (layer for layer, from start to end)
+        hin = np.dot(v, np.concatenate((patterns, bias))) # neuron "sum" before act, adds bias row
+        hout = np.concatenate((2 / (1 + np.exp(-hin)) - 1, bias)) # activation phi
+        oin = np.dot(w, hout) # (1, patterns.shape[1]+1)
+        out = 2 / (1 + np.exp(-oin)) - 1 # (1, ndata) = targets.shape
+        th_out = -1*(out <= 0) + 1*(out > 0)
 
-        err = np.append(err, ((out - targets)**2).mean())
+        err = np.append(err, ((th_out - targets)**2).mean())
+        acc = np.append(acc, (np.all(th_out == targets, axis = 1)).mean())
 
         ## backward pass (error signal for each node, from end to start)
-        delta_o = (out - targets) * ((1 + out) * (1 - out)) / 2 # dphi last, (1, ndata) 8,8
-        delta_h = np.dot(w.T, delta_o) * ((1 + hout) * (1 - hout)) / 2 # dphi first 4,8 8,8
+        delta_o = (out - targets) * ((1 + out) * (1 - out)) / 2 # dphi last, (1, ndata)
+        delta_h = np.dot(w.T, delta_o) * ((1 + hout) * (1 - hout)) / 2 # dphi first
         delta_h = delta_h[0: n_hidden, :] # (n_hidden, ndata)
 
         ## weight update
@@ -43,21 +39,18 @@ def delta_rule_1hlayer_batch(patterns, targets, n_hidden = 2, eta = 0.001, alpha
         dv = (dv * alpha) - np.dot(delta_h, np.concatenate((patterns, bias)).T) * (1 - alpha) # (n_hidden, in_dim+1)
         w = w + dw * eta
         v = v + dv * eta
-    if plot:
+    if plot_d:
         decision = - 1 / w[0, 1] * (w[0, 2] + w[0, 0] * x1) # from Wx = 0 (indexes are translated 1 bc w0 in formula is w2 here)
         plt.plot(x1, decision, c = 'pink')
+    if plot_acc:
+        plt.plot(acc)
+        plt.title('accuracy (corr samples: ' + str(np.sum(th_out == targets)) + ', final acc: ' + str(acc[-1]) + ')')
+        plt.show()
     return err
 
 def delta_rule_1hlayer_batch_val(patterns_tr, patterns_val, targets_tr, targets_val, n_hidden = 2, eta = 0.001, alpha = 0.9, epochs = 20, plot_d = True, plot_val = False):
 
     ## initialisation
-    # n_hidden = 2
-    # nIt = 60 # ?????
-    # stepL = 1 # ?????
-    # eta = 0.001 # learning rate
-    # alpha = 0.9 # momentum
-    # epochs = 20 # how many times the batch goes through the network
-
     ndata = patterns_tr.shape[1] # cols
     in_dim = patterns_tr.shape[0]
 
@@ -79,16 +72,18 @@ def delta_rule_1hlayer_batch_val(patterns_tr, patterns_val, targets_tr, targets_
         hout = np.concatenate((2 / (1 + np.exp(-hin)) - 1, bias)) # activation phi
         oin = np.dot(w, hout) # (1, patterns.shape[1]+1)
         out = 2 / (1 + np.exp(-oin)) - 1 # (1, ndata) = targets.shape
+        th_out = -1*(out <= 0) + 1*(out > 0)
 
-        err_tr = np.append(err_tr, ((out - targets_tr)**2).mean())
+        err_tr = np.append(err_tr, ((th_out - targets_tr)**2).mean())
 
         ## validation
         hin_val = np.dot(v, np.concatenate((patterns_val, bias_v))) # neuron "sum" before act, adds bias row
         hout_val = np.concatenate((2 / (1 + np.exp(-hin_val)) - 1, bias_v)) # activation phi
         oin_val = np.dot(w, hout_val) # (1, patterns_val.shape[1]+1)
         out_val = 2 / (1 + np.exp(-oin_val)) - 1 # (1, ndata) = targets_val.shape
+        th_out_val = -1*(out_val <= 0) + 1*(out_val > 0)
 
-        err_val = np.append(err_val, ((out_val - targets_val)**2).mean())
+        err_val = np.append(err_val, ((th_out_val - targets_val)**2).mean())
 
         ## backward pass (error signal for each node, from end to start)
         delta_o = (out - targets_tr) * ((1 + out) * (1 - out)) / 2 # dphi last, (1, ndata)
@@ -107,7 +102,7 @@ def delta_rule_1hlayer_batch_val(patterns_tr, patterns_val, targets_tr, targets_
             if e % int(epochs/5) == 0:
                 plt.plot(out_val.T, linewidth = 0.5)
             if e == epochs-1:
-                plt.title('validation shapes')
+                plt.title('validation shapes, final err: ' + err_val[-1])
                 plt.legend(np.arange(int(epochs/int(epochs/5))))
 
     if plot_d:
@@ -118,12 +113,6 @@ def delta_rule_1hlayer_batch_val(patterns_tr, patterns_val, targets_tr, targets_
 def delta_rule_0hlayer_batch(patterns, targets, eta = 0.001, alpha = 0.9, epochs = 20):
 
     ## initialisation
-    # nIt = 60 # ?????
-    # stepL = 1 # ?????
-    # eta = 0.001 # learning rate
-    # alpha = 0.9 # momentum
-    # epochs = 20 # how many times the batch goes through the network
-
     ndata = patterns.shape[1] # cols
     in_dim = patterns.shape[0]
 
@@ -155,12 +144,6 @@ def delta_rule_0hlayer_batch(patterns, targets, eta = 0.001, alpha = 0.9, epochs
 def delta_rule_0hlayer_seq(patterns, targets, eta = 0.001, alpha = 0.9, epochs = 20):
 
     ## initialisation
-    # nIt = 60 # ?????
-    # stepL = 1 # ?????
-    # eta = 0.001 # learning rate
-    # alpha = 0.9 # momentum
-    # epochs = 20 # how many times the batch goes through the network
-
     ndata = patterns.shape[1] # cols
     in_dim = patterns.shape[0]
 
@@ -195,12 +178,6 @@ def delta_rule_0hlayer_seq(patterns, targets, eta = 0.001, alpha = 0.9, epochs =
 def delta_rule_0hlayer_batch_nbias(patterns, targets, eta = 0.001, alpha = 0.9, epochs = 20):
 
     ## initialisation
-    # nIt = 60 # ?????
-    # stepL = 1 # ?????
-    # eta = 0.001 # learning rate
-    # alpha = 0.9 # momentum
-    # epochs = 20 # how many times the batch goes through the network
-
     ndata = patterns.shape[1] # cols
     in_dim = patterns.shape[0]
 

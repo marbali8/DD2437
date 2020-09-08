@@ -9,14 +9,13 @@ from extras import plot_error
 patterns = -np.ones((8, 8)) + 2*np.identity(8) # (8, ndata) = (8, 8)
 np.random.shuffle(patterns)
 targets = patterns.copy()
-e = delta_rule_1hlayer_batch(patterns, targets, n_hidden = 3, epochs = 100, plot = False)
+e = delta_rule_1hlayer_batch(patterns, targets, n_hidden = 3, epochs = 10000, plot_d = False, plot_acc = True)
 
-plot_error(e, '838 hour-glass')
-# plt.show()
-# plt.close()
-
-
-e_2 = delta_rule_1hlayer_batch(patterns, targets, n_hidden = 2, epochs = 100, plot = False)
-plot_error(e_2, '828 hour-glass', new_fig = False)
+plot_error(e[::100], '838 hour-glass')
 plt.show()
 plt.close()
+
+# e_2 = delta_rule_1hlayer_batch(patterns, targets, n_hidden = 2, epochs = 100, plot = False)
+# plot_error(e_2, '828 hour-glass', new_fig = False)
+# plt.show()
+# plt.close()
