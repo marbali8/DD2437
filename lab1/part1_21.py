@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from delta import delta_rule_1hlayer_batch, delta_rule_1hlayer_batch_val
+from delta import delta_rule_1hlayer_batch, delta_rule_1hlayer_batch_val, delta_rule_1hlayer_seq_val
 from extras import plot_error
 
 
@@ -21,8 +21,8 @@ classA = np.concatenate([classA, -np.ones((1, ndata))])  # (3, ndata)
 classB = np.random.randn(2, ndata) * sigmaB + mB # (2, ndata)
 classB = np.concatenate([classB, np.ones((1, ndata))])  # (3, ndata)
 
-plt.scatter(classA[0], classA[1], c = 'red')
-plt.scatter(classB[0], classB[1], c = 'blue')
+plt.scatter(classA[0], classA[1], c = 'red', s = 2)
+plt.scatter(classB[0], classB[1], c = 'blue', s = 2)
 
 ## part 1
 
@@ -31,8 +31,8 @@ plt.scatter(classB[0], classB[1], c = 'blue')
 # patterns = data[:2, :] # (2, 2ndata)
 # targets = data[-1:, :] # (1, 2ndata)
 #
-# e = delta_rule_1hlayer_batch(patterns, targets, epochs = 100, n_hidden = 100)
-# plt.legend('-AB')
+# e = delta_rule_1hlayer_batch(patterns, targets, epochs = 100, n_hidden = 100, plot_d = False, plot_acc = True)
+# plt.legend('AB')
 #
 # plot_error(e, 'all train gen delta rule')
 # plt.show()
@@ -50,10 +50,16 @@ targets_tr = training[-1:, :] # (1, 1.5*ndata)
 targets_te = validation[-1:, :]
 
 e_tr, e_val = delta_rule_1hlayer_batch_val(patterns_tr, patterns_val, targets_tr, targets_te, epochs = 100, n_hidden = 10)
-plt.legend('-AB')
+e_s_tr, e_s_val = delta_rule_1hlayer_seq_val(patterns_tr, patterns_val, targets_tr, targets_te, epochs = 100, n_hidden = 10)
+plt.legend('bsAB')
 
 plot_error(e_val)
-plot_error(e_tr, '-25% each delta rule', new_fig = False)
+plot_error(e_tr, 'batch -25% each delta rule', new_fig = False)
 plt.legend('vt')
+
+plot_error(e_s_val[::patterns_val.shape[1]].flatten())
+plot_error(e_s_tr[::patterns_val.shape[1]].flatten(), 'seq -25% each delta rule', new_fig = False)
+plt.legend('vt')
+
 plt.show()
 plt.close()

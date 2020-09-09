@@ -18,9 +18,10 @@ np.random.shuffle(reorder_idx)
 i_tr = reorder_idx[:int(ndata*0.75)]
 i_val = reorder_idx[int(ndata*0.75):]
 
-e_tr, _ = delta_rule_1hlayer_batch_val(patterns[:, i_tr], patterns[:, i_val], targets[:, i_tr], targets[:, i_val], n_hidden = 10, plot_d = False, plot_val = True, epochs = 200)
+e_tr, _ = delta_rule_1hlayer_batch_val(patterns[:, i_tr], patterns[:, i_val], targets[:, i_tr], targets[:, i_val], n_hidden = 10, plot_d = False, plot_val = True, epochs = 1000)
 plt.plot(targets.T[::4])
+# not sure if i need to represent this with validation shapes. it's different length!
 
-plot_error(e_tr[::5])
+plot_error(e_tr[::5], 'function approx error')
 plt.show()
 plt.close()

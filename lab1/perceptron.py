@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def perceptron_rule_0hlayer_batch(patterns, targets, eta = 0.001, alpha = 0.9, epochs = 20):
+def perceptron_rule_0hlayer_batch(patterns, targets, eta = 0.001, alpha = 0.9, epochs = 20, print_acc = False):
 
     ## initialisation
     # nIt = 60 # ?????
@@ -17,6 +17,7 @@ def perceptron_rule_0hlayer_batch(patterns, targets, eta = 0.001, alpha = 0.9, e
     w = np.random.randn(targets.shape[0], in_dim+1) # from input to output
     dw = np.zeros(w.shape)
     mse = np.array([])
+    acc = np.array([])
 
     x1 = np.arange(-3, 3, 0.5)
 
@@ -26,7 +27,8 @@ def perceptron_rule_0hlayer_batch(patterns, targets, eta = 0.001, alpha = 0.9, e
         oin = np.dot(w, np.concatenate((patterns, bias))) # neuron "sum" before act, adds bias row
         out = -1*(oin <= 0) + 1*(oin > 0) # activation (tlu)
 
-        mse = np.append(mse, ((out - targets)**2).mean())
+        mse = np.append(mse, ((targets - out)**2).mean())
+        acc = np.append(acc, (np.all(out == targets, axis = 0)).mean())
 
         ## backward pass (error signal for each node, from end to start)
 
@@ -34,6 +36,8 @@ def perceptron_rule_0hlayer_batch(patterns, targets, eta = 0.001, alpha = 0.9, e
         dw = np.dot(targets - out, np.concatenate((patterns, bias)).T) # (targets.shape[0], in_dim+1)
         w = w + dw * eta
 
+    if print_acc:
+        print('{:.4f}'.format(acc[-1]))
     decision = - 1 / w[0, 1] * (w[0, 2] + w[0, 0] * x1) # from Wx = 0 (indexes are translated 1 bc w0 in formula is w2 here)
     plt.plot(x1, decision, c = 'yellow')
     return mse
