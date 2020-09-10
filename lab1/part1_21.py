@@ -16,7 +16,7 @@ sigmaB = 0.3
 # np.random.seed(0)
 
 classA = np.random.randn(2, ndata) * sigmaA + mA # (2, ndata)
-classA[0, round(ndata/2):] = np.random.randn(1, round(ndata/2)) * sigmaA - mA[0]
+classA[0, ::2] = np.random.randn(1, round(ndata/2)) * sigmaA - mA[0]
 classA = np.concatenate([classA, -np.ones((1, ndata))])  # (3, ndata)
 classB = np.random.randn(2, ndata) * sigmaB + mB # (2, ndata)
 classB = np.concatenate([classB, np.ones((1, ndata))])  # (3, ndata)
@@ -31,8 +31,8 @@ plt.scatter(classB[0], classB[1], c = 'blue', s = 2)
 # patterns = data[:2, :] # (2, 2ndata)
 # targets = data[-1:, :] # (1, 2ndata)
 #
-# e = delta_rule_1hlayer_batch(patterns, targets, epochs = 100, n_hidden = 100, plot_d = False, plot_acc = True)
-# plt.legend('AB')
+# e = delta_rule_1hlayer_batch(patterns, targets, epochs = 700, n_hidden = 5, plot_acc = True)
+# # plt.legend('dAB')
 #
 # plot_error(e, 'all train gen delta rule')
 # plt.show()
@@ -49,8 +49,8 @@ patterns_val = validation[:2, :]
 targets_tr = training[-1:, :] # (1, 1.5*ndata)
 targets_te = validation[-1:, :]
 
-e_tr, e_val = delta_rule_1hlayer_batch_val(patterns_tr, patterns_val, targets_tr, targets_te, epochs = 100, n_hidden = 10)
-e_s_tr, e_s_val = delta_rule_1hlayer_seq_val(patterns_tr, patterns_val, targets_tr, targets_te, epochs = 100, n_hidden = 10)
+e_tr, e_val = delta_rule_1hlayer_batch_val(patterns_tr, patterns_val, targets_tr, targets_te, epochs = 2000, n_hidden = 15)
+e_s_tr, e_s_val = delta_rule_1hlayer_seq_val(patterns_tr, patterns_val, targets_tr, targets_te, epochs = 2000, n_hidden = 15)
 plt.legend('bsAB')
 
 plot_error(e_val)

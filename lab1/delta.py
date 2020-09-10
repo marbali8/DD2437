@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+from extras import compute_boundary
+
 def delta_rule_1hlayer_batch(patterns, targets, n_hidden = 2, eta = 0.001, alpha = 0.9, epochs = 20, plot_d = True, plot_acc = False):
 
     ## initialisation
@@ -14,8 +16,6 @@ def delta_rule_1hlayer_batch(patterns, targets, n_hidden = 2, eta = 0.001, alpha
     dv = np.zeros(v.shape)
     err = np.array([])
     acc = np.array([])
-
-    x1 = np.arange(-3, 3, 0.5)
 
     for e in range(epochs): # [0, epochs-1]
 
@@ -40,13 +40,12 @@ def delta_rule_1hlayer_batch(patterns, targets, n_hidden = 2, eta = 0.001, alpha
         w = w + dw * eta
         v = v + dv * eta
     if plot_d:
-        decision = - 1 / w[0, 1] * (w[0, 2] + w[0, 0] * x1) # from Wx = 0 (indexes are translated 1 bc w0 in formula is w2 here)
-        plt.plot(x1, decision, c = 'pink')
+        decision = compute_boundary(patterns, v, w)
+        plt.plot(decision[0, :], decision[1, :], c = 'pink')
     if plot_acc:
         plt.figure()
         plt.plot(acc)
         plt.title('accuracy (corr samples: ' + str(np.sum(th_out == targets)) + ', final acc: ' + str(acc[-1]) + ')')
-        plt.show()
     return err
 
 def delta_rule_1hlayer_batch_val(patterns_tr, patterns_val, targets_tr, targets_val, n_hidden = 2, eta = 0.001, alpha = 0.9, epochs = 20, plot_d = True, plot_val = False):
@@ -63,8 +62,6 @@ def delta_rule_1hlayer_batch_val(patterns_tr, patterns_val, targets_tr, targets_
     dv = np.zeros(v.shape)
     err_tr = np.array([])
     err_val = np.array([])
-
-    x1 = np.arange(-3, 3, 0.5)
 
     for e in range(epochs): # [0, epochs-1]
 
@@ -107,8 +104,8 @@ def delta_rule_1hlayer_batch_val(patterns_tr, patterns_val, targets_tr, targets_
                 plt.legend(np.arange(int(epochs/int(epochs/5))))
 
     if plot_d:
-        decision = - 1 / w[0, 1] * (w[0, 2] + w[0, 0] * x1) # from Wx = 0 (indexes are translated 1 bc w0 in formula is w2 here)
-        plt.plot(x1, decision, c = 'pink')
+        decision = compute_boundary(patterns_val, v, w, xrange = (-1.5, 1.5))
+        plt.plot(decision[0, :], decision[1, :], c = 'pink')
     return err_tr, err_val
 
 def delta_rule_1hlayer_seq_val(patterns_tr, patterns_val, targets_tr, targets_val, n_hidden = 2, eta = 0.001, alpha = 0.9, epochs = 20, plot_d = True, plot_val = False):
@@ -125,8 +122,6 @@ def delta_rule_1hlayer_seq_val(patterns_tr, patterns_val, targets_tr, targets_va
     dv = np.zeros(v.shape)
     err_tr = np.array([])
     err_val = np.array([])
-
-    x1 = np.arange(-3, 3, 0.5)
 
     for e in range(epochs): # [0, epochs-1]
 
@@ -172,8 +167,8 @@ def delta_rule_1hlayer_seq_val(patterns_tr, patterns_val, targets_tr, targets_va
                 plt.legend(np.arange(int(epochs/int(epochs/5))))
 
     if plot_d:
-        decision = - 1 / w[0, 1] * (w[0, 2] + w[0, 0] * x1) # from Wx = 0 (indexes are translated 1 bc w0 in formula is w2 here)
-        plt.plot(x1, decision, c = 'magenta')
+        decision = compute_boundary(patterns_tr, v, w, xrange = (-1.5, 1.5))
+        plt.plot(decision[0, :], decision[1, :], c = 'magenta')
     return err_tr, err_val
 
 def delta_rule_0hlayer_batch(patterns, targets, eta = 0.001, alpha = 0.9, epochs = 20, print_acc = False):
