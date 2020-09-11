@@ -9,9 +9,9 @@ from perceptron import perceptron_rule_0hlayer_batch, perceptron_rule_0hlayer_ba
 
 ## create data
 n = 100;
-mA = [[-2.0], [1.0]]
+mA = [[-1.5], [1.0]]
 sigmaA = 0.5
-mB = [[1.0], [-2.0]]
+mB = [[1.0], [-1.5]]
 sigmaB = 0.5
 
 # np.random.seed(0)
@@ -33,9 +33,9 @@ targets = data[-1:, :] # (1, 2n)
 
 ### question 1
 
-## compute error
-# e_d = delta_rule_0hlayer_batch(patterns, targets)
-# mse_p = perceptron_rule_0hlayer_batch(patterns, targets)
+# # compute error
+# e_d = delta_rule_0hlayer_batch(patterns, targets, epochs = 30)
+# mse_p = perceptron_rule_0hlayer_batch(patterns, targets, epochs = 30)
 # plt.legend('dpAB')
 #
 # plot_error(e_d, 'delta rule')
@@ -48,14 +48,14 @@ targets = data[-1:, :] # (1, 2n)
 
 ### question 2
 
-# e_b = delta_rule_0hlayer_batch(patterns, targets)
-# e_s = delta_rule_0hlayer_seq(patterns, targets)
-# plt.legend('bsAB')
-#
-# plot_error(e_b, 'batch')
-# plot_error(e_s[::2*n].flatten(), 'sequential')
-# plt.show()
-# plt.close()
+e_b = delta_rule_0hlayer_batch(patterns, targets)
+e_s = delta_rule_0hlayer_seq(patterns, targets)
+plt.legend('bsAB')
+
+plot_error(e_b, 'batch')
+plot_error(e_s[::2*n].flatten(), 'sequential')
+plt.show()
+plt.close()
 
 # 2. sequential converges last, very sensitive to random init! (comment seed(0))
 

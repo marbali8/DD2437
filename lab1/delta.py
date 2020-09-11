@@ -45,7 +45,7 @@ def delta_rule_1hlayer_batch(patterns, targets, n_hidden = 2, eta = 0.001, alpha
     if plot_acc:
         plt.figure()
         plt.plot(acc)
-        plt.title('accuracy (corr samples: ' + str(np.sum(th_out == targets)) + ', final acc: ' + str(acc[-1]) + ')')
+        plt.title('accuracy (final acc: ' + str(acc[-1]) + ', incorrect samples: ' + str(np.sum(th_out != targets)) + ')')
     return err
 
 def delta_rule_1hlayer_batch_val(patterns_tr, patterns_val, targets_tr, targets_val, n_hidden = 2, eta = 0.001, alpha = 0.9, epochs = 20, plot_d = True, plot_val = False):
@@ -105,7 +105,9 @@ def delta_rule_1hlayer_batch_val(patterns_tr, patterns_val, targets_tr, targets_
 
     if plot_d:
         decision = compute_boundary(patterns_val, v, w, xrange = (-1.5, 1.5))
-        plt.plot(decision[0, :], decision[1, :], c = 'pink')
+        plt.plot(decision[0, :], decision[1, :])
+    print('match val: ' + str(np.sum(th_out_val == targets_val)) + '/' + str(th_out_val.size))
+    print('match tr: ' + str(np.sum(th_out == targets_tr)) + '/' + str(th_out.size))
     return err_tr, err_val
 
 def delta_rule_1hlayer_seq_val(patterns_tr, patterns_val, targets_tr, targets_val, n_hidden = 2, eta = 0.001, alpha = 0.9, epochs = 20, plot_d = True, plot_val = False):
@@ -169,6 +171,8 @@ def delta_rule_1hlayer_seq_val(patterns_tr, patterns_val, targets_tr, targets_va
     if plot_d:
         decision = compute_boundary(patterns_tr, v, w, xrange = (-1.5, 1.5))
         plt.plot(decision[0, :], decision[1, :], c = 'magenta')
+
+    print('missmatch: ' + str(np.sum(th_out_val != targets_val)))
     return err_tr, err_val
 
 def delta_rule_0hlayer_batch(patterns, targets, eta = 0.001, alpha = 0.9, epochs = 20, print_acc = False):

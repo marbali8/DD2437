@@ -6,8 +6,8 @@ def plot_error(e, title = '', new_fig = True):
     if new_fig:
         plt.figure()
     plt.plot(range(1, e.shape[0]+1), e)
-    plt.ylabel('error'), plt.xlabel('epoch'), plt.xticks(range(1, e.shape[0]+1))
-    plt.title(title + ', final error: ' + '{:.4f}'.format(e[-1]))
+    plt.ylabel('error'), plt.xlabel('epoch'), #plt.xticks(range(1, e.shape[0]+1))
+    plt.title(title)
 
 def compute_boundary(input, v, w, xrange = None, yrange = None):
 
@@ -38,7 +38,7 @@ def compute_boundary(input, v, w, xrange = None, yrange = None):
             hin = np.dot(v, np.concatenate((data, bias))) # neuron "sum" before act, adds bias row
             hout = np.concatenate((2 / (1 + np.exp(-hin)) - 1, bias)) # activation phi
             oin = np.dot(w, hout)
-            
+
             if i == 0:
                 out = 2 / (1 + np.exp(-oin)) - 1
 

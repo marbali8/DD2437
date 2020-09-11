@@ -50,9 +50,9 @@ from perceptron import perceptron_rule_0hlayer_batch
 
 ndata = 100;
 mA = [[-1.0], [0.3]]
-sigmaA = 0.2
+sigmaA = 0.9
 mB = [[0.0], [-0.1]]
-sigmaB = 0.3
+sigmaB = 0.9
 
 # np.random.seed(0)
 
@@ -84,8 +84,8 @@ classB = np.concatenate([classB, np.ones((1, ndata))])  # (3, ndata)
 
 ## subsampling 2: -25% each
 
-# sub_A = classA[:, round(ndata*0.75):]
-# sub_B = classB[:, round(ndata*0.75):]
+# sub_A = classA[:, :round(ndata*0.75)]
+# sub_B = classB[:, :round(ndata*0.75)]
 #
 # plt.scatter(sub_A[0], sub_A[1], c = 'red', s = 2)
 # plt.scatter(sub_B[0], sub_B[1], c = 'blue', s = 2)
@@ -106,7 +106,7 @@ classB = np.concatenate([classB, np.ones((1, ndata))])  # (3, ndata)
 
 ## subsampling 3: -50% A
 
-# sub_A = classA[:, round(ndata*0.5):]
+# sub_A = classA[:, :round(ndata*0.5)]
 #
 # plt.scatter(sub_A[0], sub_A[1], c = 'red', s = 2)
 # plt.scatter(classB[0], classB[1], c = 'blue', s = 2)
@@ -127,7 +127,7 @@ classB = np.concatenate([classB, np.ones((1, ndata))])  # (3, ndata)
 
 ## subsampling 4: -50% B
 
-# sub_B = classB[:, round(ndata*0.5):]
+# sub_B = classB[:, :round(ndata*0.5)]
 #
 # plt.scatter(classA[0], classA[1], c = 'red', s = 2)
 # plt.scatter(sub_B[0], sub_B[1], c = 'blue', s = 2)
@@ -148,7 +148,7 @@ classB = np.concatenate([classB, np.ones((1, ndata))])  # (3, ndata)
 
 ## subsampling 5: -20% A[0, :]<0 and -80% A[0, :]>0
 
-sub_A = classA[:, classA[0] < 0][:, round(ndata*0.8):]
+sub_A = classA[:, classA[0] < 0][:, :round(ndata*0.8)]
 sub_A = np.concatenate([sub_A, classA[:, classA[0] > 0][:, round(ndata*0.2):]], axis = 1)
 
 plt.scatter(sub_A[0], sub_A[1], c = 'red', s = 2)
@@ -159,8 +159,8 @@ np.random.shuffle(data.T) # (3, sub_A.shape[1])
 patterns = data[:2, :] # (2, sub_A.shape[1])
 targets = data[-1:, :] # (1, sub_A.shape[1])
 
-e_d = delta_rule_0hlayer_batch(patterns, targets, print_acc = True)
-mse_p = perceptron_rule_0hlayer_batch(patterns, targets, print_acc = True)
+e_d = delta_rule_0hlayer_batch(patterns, targets, print_acc = True, epochs = 50)
+mse_p = perceptron_rule_0hlayer_batch(patterns, targets, print_acc = True, epochs = 50)
 plt.legend('dpAB')
 
 plot_error(e_d, '-20% A[0, :]<0 and -80% A[0, :]>0 delta rule')

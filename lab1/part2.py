@@ -29,7 +29,7 @@ patterns_tr, patterns_te, targets_tr, targets_te = train_test_split(patterns, ta
 ## part 1
 
 # # 3 layer mlp (without output activation so that targets can be continuous for regression)
-# nn = MLPRegressor(hidden_layer_sizes = (20, 10), early_stopping = True) # learning_rate_init = 0.0001, validation_fraction = 0.1)
+# nn = MLPRegressor(hidden_layer_sizes = (100, 10), early_stopping = True) # learning_rate_init = 0.0001, validation_fraction = 0.1)
 # # solver sgd and activation logistic literally fuck it up the most (will not edit momentum bc it's only used with solver sgd)
 # # early_stopping works!
 # # i feel like alpha (regularisation) doesn't really do much. the most is hidden layers and early_stopping
@@ -46,32 +46,48 @@ patterns_tr, patterns_te, targets_tr, targets_te = train_test_split(patterns, ta
 
 ## part 2
 
-std = [0.03, 0.09, 0.18]
-h_size = [(20, 4), (20, 6), (20, 8), (20, 10)]
-alpha = np.arange(2, 6)
-idx = [(s, h) for s in range(len(std)) for h in range(len(h_size))]
+# std = [0.03, 0.09, 0.18]
+# h_size = [(20, 4), (20, 6), (20, 8), (20, 10)]
+# alpha = np.arange(2, 6)
+# idx = [(s, h) for s in range(len(std)) for h in range(len(h_size))]
+#
+# for ai, a in enumerate(alpha):
+#
+#     weights = np.array([])
+#
+#     for i in idx:
+#
+#         patterns_tr += np.random.normal(0, std[i[0]], patterns_tr.shape)
+#         patterns_te += np.random.normal(0, std[i[0]], patterns_te.shape)
+#         targets_tr += np.random.normal(0, std[i[0]], targets_tr.shape)
+#         targets_te += np.random.normal(0, std[i[0]], targets_te.shape)
+#
+#         nn = MLPRegressor(hidden_layer_sizes = h_size[i[1]], alpha = 1/(10**a))
+#         nn.fit(patterns_tr, targets_tr)
+#         out_te = nn.predict(patterns_te)
+#         print(a, std[i[0]], h_size[i[1]], '{:.4f}'.format(((out_te - targets_te)**2).mean()))
+#
+#         # weights size = in_dim*hidden_neurons_1 + hidden_neurons_1*hidden_neurons_2
+#         weights = np.concatenate((weights, nn.coefs_[0].flatten(), nn.coefs_[1].flatten()))
+#
+#     plt.figure()
+#     plt.hist(weights, 25, rwidth = 0.9)
+#     plt.title('Weight histogram for a = 1/10**' + str(int(a)))
+#
+# plt.show()
 
-for ai, a in enumerate(alpha):
 
-    weights = np.array([])
+patterns_tr += np.random.normal(0, 0.09, patterns_tr.shape)
 
-    for i in idx:
+nn = MLPRegressor(hidden_layer_sizes = (50,))
+nn.fit(patterns_tr, targets_tr)
 
-        patterns_tr += np.random.normal(0, std[i[0]], patterns_tr.shape)
-        patterns_te += np.random.normal(0, std[i[0]], patterns_te.shape)
-        targets_tr += np.random.normal(0, std[i[0]], targets_tr.shape)
-        targets_te += np.random.normal(0, std[i[0]], targets_te.shape)
-
-        nn = MLPRegressor(hidden_layer_sizes = h_size[i[1]], alpha = 1/(10**a))
-        nn.fit(patterns_tr, targets_tr)
-        out_te = nn.predict(patterns_te)
-        print(a, std[i[0]], h_size[i[1]], '{:.4f}'.format(((out_te - targets_te)**2).mean()))
-
-        # weights size = in_dim*hidden_neurons_1 + hidden_neurons_1*hidden_neurons_2
-        weights = np.concatenate((weights, nn.coefs_[0].flatten(), nn.coefs_[1].flatten()))
-
-    plt.figure()
-    plt.hist(weights, 25, rwidth = 0.9)
-    plt.title('Weight histogram for a = 1/10**' + str(int(a)))
-
+out = nn.predict(patterns)
+plt.figure()
+plt.plot(patterns[:, 4])
+plt.plot(out)
+mse = ((out - targets)**2).mean()
+plt.legend(['target', 'predicted (mse ' + '{:.4f}'.format(mse) + ')'])
+plt.xticks([])
 plt.show()
+plt.close()
