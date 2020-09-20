@@ -35,7 +35,7 @@ def delta_1hlayer(p_tr, p_val, t_tr, t_val, n_hidden, eta = 0.001, epochs = 200,
         out_val = 2 / (1 + np.exp(-oin_val)) - 1
         th_out = -1*(out_val <= 0) + 1*(out_val > 0)
 
-        err_val = np.append(err_val, np.mean(np.abs(th_out - tar_val)))
+        err_val = np.append(err_val, np.sqrt(np.mean((th_out - tar_val)**2)))
 
         ## backward pass
         delta_o = (out - t_tr) * ((1 + out) * (1 - out)) / 2
@@ -53,12 +53,11 @@ def delta_1hlayer(p_tr, p_val, t_tr, t_val, n_hidden, eta = 0.001, epochs = 200,
 
 
 x = np.arange(0, 2*np.pi+0.1, 0.1)
-patt_tr = x + np.random.normal(0, 0.1, x.shape)
-aux = np.sin(2*patt_tr)
+patt_tr = x.copy()
+aux = np.sin(2*patt_tr) + np.random.normal(0, 0.1, patt_tr.shape)
 tar_tr = 1*(aux >= 0) + (-1)*(aux < 0)
 patt_val = x[5:]
-patt_val += np.random.normal(0, 0.1, patt_val.shape)
-aux = np.sin(2*patt_val)
+aux = np.sin(2*patt_val) + np.random.normal(0, 0.1, patt_val.shape)
 tar_val = 1*(aux >= 0) + (-1)*(aux < 0)
 
 t1 = time.time()
