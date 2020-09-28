@@ -11,7 +11,7 @@ patterns = np.array([x1, x2, x3])
 P = patterns.shape[0]
 N = patterns.shape[1] # number of units
 
-distortion_type = True # distorted if false, noise added if true
+distortion_type = False # distorted if false, noise added if true
 
 patterns_d = patterns.copy().astype('float')
 noise = np.arange(0, 1+0.1, 0.1)

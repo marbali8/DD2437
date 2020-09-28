@@ -34,13 +34,15 @@ for i, p in enumerate(all_combinations):
     p = p.reshape((-1, 1))
     e = - np.sum(w * np.dot(p, p.T))
     color = 'orange'
-    if np.any(i == np.where(correct)[0]): # attractors
-        color = 'blue'
-    elif np.any(np.sum(p.T == patterns_d, axis = 1) == N): # distorted
+    if np.any(np.sum(p.T == patterns_d, axis = 1) == N): # distorted
         color = 'green'
+    elif np.any(np.sum(p.T == patterns, axis = 1) == N): # stored
+        color = 'purple'
+    elif np.any(i == np.where(correct)[0]): # attractors in general
+        color = 'blue'
     plt.scatter([i], [e], c = color)
 
-plt.show()
+plt.xlabel('n pattern'), plt.ylabel('energy'), plt.show()
 
 # the energy in the attractors is in majority twice as low as the others
 # the energy in the distorted sequences is
