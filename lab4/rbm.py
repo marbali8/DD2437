@@ -76,9 +76,13 @@ class RestrictedBoltzmannMachine():
         """
 
         print ("learning CD1")
+        self.rf['period'] = int(n_iterations / 10)
+        self.print_period = int(n_iterations / 10)
 
         n_samples = visible_trainset.shape[0]
+        data = visible_trainset.copy()
         it = 0
+        recon_loss = []
 
         while it < n_iterations:
 
@@ -89,36 +93,42 @@ class RestrictedBoltzmannMachine():
             # for get_h_given_v and get_v_given_h, not sure if prob or binary
             # (look at 3.1 - 3.4 of "Practical guide to training RBM")
             start = it*self.batch_size % n_samples
-            v_0 = visible_trainset[start: start+self.batch_size, :]
+            if it*self.batch_size % n_samples == 0: # new epoch
+                # according to 4.1 of "Practical guide to training RBM"
+                np.random.shuffle(data)
+
+            v_0 = data[start: start+self.batch_size, :]
             (prob_h0, h_0) = self.get_h_given_v(v_0)
             (prob_v1, v_1) = self.get_v_given_h(prob_h0)
             (prob_h1, h_1) = self.get_h_given_v(prob_v1)
 
             # [TODO TASK 4.1] update the parameters using function 'update_params'
 
-            self.update_params(v_0, h_0, prob_v1, prob_h1)
+            self.update_params(v_0, h_0, prob_v1, prob_h1, stats = it % self.print_period == 0)
 
             # visualize once in a while when visible layer is input images
 
-            if it % self.rf["period"] == 0 and self.is_bottom:
+            if (it % self.rf["period"] == 0 or it == n_iterations - 1) and self.is_bottom:
 
                 viz_rf(weights=self.weight_vh[:,self.rf["ids"]].reshape((self.image_size[0],self.image_size[1],-1)), it=it, grid=self.rf["grid"])
 
             # print progress
 
-            if it % self.print_period == 0 :
+            if it % self.print_period == 0 or it == n_iterations - 1:
 
                 # i use prob_h ([0]) to update v (= training) but not sure
                 rec = self.get_v_given_h(self.get_h_given_v(visible_trainset)[0])[1]
+                loss = np.sum((visible_trainset - rec)**2)/n_samples
+                recon_loss.append((it, loss))
 
-                print ("iteration=%7d recon_loss=%4.4f"%(it, np.sum((visible_trainset - rec)**2)/n_samples))
+                print ("iteration=%7d recon_loss=%4.4f"%(it, loss))
 
             it += 1
 
-        return
+        return recon_loss
 
 
-    def update_params(self, v_0, h_0, v_k, h_k):
+    def update_params(self, v_0, h_0, v_k, h_k, stats = False):
 
         """Update the weight and bias parameters.
 
@@ -136,6 +146,8 @@ class RestrictedBoltzmannMachine():
         self.delta_bias_v = self.learning_rate * np.mean(v_0 - v_k, axis = 0)
         self.delta_weight_vh = self.learning_rate * ((v_0.T @ h_0) - (v_k.T @ h_k))
         self.delta_bias_h = self.learning_rate * np.mean(h_0 - h_k, axis = 0)
+
+        if stats: print_weight_stats(self.weight_vh, self.delta_weight_vh)
 
         self.bias_v += self.delta_bias_v
         self.weight_vh += self.delta_weight_vh

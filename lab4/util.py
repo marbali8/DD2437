@@ -122,3 +122,21 @@ def stitch_video(fig, imgs):
     import matplotlib.animation as animation
 
     return animation.ArtistAnimation(fig, imgs, interval=100, blit=True, repeat=False)
+
+def print_weight_stats(weigths, delta):
+
+    m = np.mean(weigths)
+    v = np.var(weigths)
+    ma = np.max(weigths)
+    mi = np.min(weigths)
+
+    if ma > 5 or mi < -5: # Q&A lab 4 on canvas
+        print('weights: mean %3.3f var %3.3f max %3.3f min %3.3f' % (m, v, ma, mi))
+
+    m = np.mean(delta / weigths)
+    v = np.var(delta / weigths)
+    ma = np.max(delta / weigths)
+    mi = np.min(delta / weigths)
+
+    if np.abs(m) > 1e-3: # 7.1 (happens a lot)
+        print('delta/w %%: mean %3.3f var %3.3f max %3.3f min %3.3f' % (m, v, ma, mi))
